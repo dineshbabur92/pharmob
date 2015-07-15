@@ -1,17 +1,15 @@
 package com.androidlearner.dineshbaburengasamy.epharma;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -27,14 +25,37 @@ public class MainActivity extends ActionBarActivity {
     private Uri fileUri;
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
-    private Button b1;
     private ImageView iv;
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        UploadPrescriptionButton uploadButton = UploadPrescriptionButton.newInstance(fileUri.getPath(), CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+        /*
+        //http://stackoverflow.com/questions/9245408/best-practice-for-instantiating-a-new-android-fragment
+        MyFragment myFragment = new MyFragment();
+
+        Bundle args = new Bundle();
+        args.putInt("someInt", someInt);
+        myFragment.setArguments(args);
+
+        return myFragment;
+        //http://stackoverflow.com/questions/9245408/best-practice-for-instantiating-a-new-android-fragment
+        */
+        //http://developer.android.com/training/basics/fragments/fragment-ui.html
+        if(!(findViewById(R.id.main_container)==null)) {
+            if(!(savedInstanceState==null))
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.main_container, uploadButton)
+                        .commit();
+        }
+
+        //iv=(ImageView)findViewById(R.id.presImageView);
+        //http://developer.android.com/training/basics/fragments/fragment-ui.html
 
         /*
         //http://developer.android.com/guide/topics/media/camera.html
@@ -48,20 +69,6 @@ public class MainActivity extends ActionBarActivity {
         startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         //http://developer.android.com/guide/topics/media/camera.html
         */
-
-        b1=(Button)findViewById(R.id.upldPresButton);
-        iv=(ImageView)findViewById(R.id.presImageView);
-
-        b1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a file to save the image
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
-                startActivityForResult(intent, 0);
-            }
-        });
-
     }
 
     @Override
@@ -85,32 +92,57 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+    /*private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+    }*/
+    public void postImageUpload(int requestCode, int resultCode) {
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // TODO Auto-generated method stub
-        super.onActivityResult(requestCode, resultCode, data);
+        //super.onActivityResult(requestCode, resultCode, data);
 
-        Bitmap bp = (Bitmap) data.getExtras().get("data");
-        iv.setImageBitmap(bp);
-
+      //  Bitmap bp = (Bitmap) data.getExtras().get("data");
+        //iv.setImageBitmap(bp);
+        Log.v(LOG_TAG,"Inside onactivityresult");
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 // Image captured and saved to fileUri specified in the Intent
-                Toast.makeText(this, "Image saved to:\n" +
+                /*Toast.makeText(this, "Image saved to:\n" +
                         data.getData(), Toast.LENGTH_LONG).show();
+                Log.v(LOG_TAG,"Image saved to:\n" +
+                        data.getData());*/
+                Toast.makeText(this, "Image saved to:\n" +
+                        fileUri.getPath(), Toast.LENGTH_LONG).show();
+                Log.v(LOG_TAG,"Image saved to:\n" +
+                        fileUri.getPath());
+               /*
+                Bundle extras = data.getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                iv.setImageBitmap(imageBitmap);
+               */
+                //http://stackoverflow.com/questions/6224710/set-imageview-to-show-image-in-sdcard
+                Bitmap bmp = BitmapFactory.decodeFile(fileUri.getPath());
+                //iv.setImageBitmap(bmp);
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.main_container, new AddInfo());
+                ft.addToBackStack(null);
+                ft.commit();
+                //http://stackoverflow.com/questions/6224710/set-imageview-to-show-image-in-sdcard
+                //refer http://stackoverflow.com/questions/9890757/android-camera-data-intent-returns-null
             } else if (resultCode == RESULT_CANCELED) {
-                // User cancelled the image capture
+                Log.v(LOG_TAG,"Image capture cancelled");
             } else {
-                // Image capture failed, advise user
+                Log.v(LOG_TAG,"Image capture failed");
             }
         }
 
         if (requestCode == CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 // Video captured and saved to fileUri specified in the Intent
-                Toast.makeText(this, "Video saved to:\n" +
-                        data.getData(), Toast.LENGTH_LONG).show();
+               // Toast.makeText(this, "Video saved to:\n" +
+                   //     data.getData(), Toast.LENGTH_LONG).show();
             } else if (resultCode == RESULT_CANCELED) {
                 // User cancelled the video capture
             } else {
@@ -121,24 +153,25 @@ public class MainActivity extends ActionBarActivity {
 
     //http://developer.android.com/guide/topics/media/camera.html#saving-media
     /** Create a file Uri for saving an image or video */
-    private static Uri getOutputMediaFileUri(int type){
+    private Uri getOutputMediaFileUri(int type){
+        Log.v(LOG_TAG, Uri.fromFile(getOutputMediaFile(type)).toString());
         return Uri.fromFile(getOutputMediaFile(type));
     }
 
     /** Create a File for saving an image or video */
-    private static File getOutputMediaFile(int type){
+    private File getOutputMediaFile(int type){
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyCameraApp");
+                Environment.DIRECTORY_PICTURES), getString(R.string.app_name));
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
         // Create the storage directory if it does not exist
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
-                Log.d("MyCameraApp", "failed to create directory");
+                Log.d(LOG_TAG, "failed to create directory");
                 return null;
             }
         }
