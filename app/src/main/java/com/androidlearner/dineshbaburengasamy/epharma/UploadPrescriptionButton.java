@@ -6,34 +6,36 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import java.io.File;
-
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link UploadPrescriptionButton.OnFragmentInteractionListener} interface
+ * {link UploadPrescriptionButton.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link UploadPrescriptionButton#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class UploadPrescriptionButton extends Fragment {
+public class UploadPrescriptionButton extends Fragment implements XmlClickable{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String FILE_URI_KEY = "fileUri";
+   // private static final String FILE_URI_KEY = "fileUri";//uncomment for new instance
    // private static final String MEDIA_TYPE_KEY = "mediaType";
-    private static final String CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE_KEY = "imageActivityRequestCode";
+   // public static final String CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE_KEY = "imageActivityRequestCode"; //uncomment for new instance
+    public static final String LOG_TAG = UploadPrescriptionButton.class.getSimpleName();
     private Button b1;
 
     // TODO: Rename and change types of parameters
     private Uri fileUri;
   //  private String mediaType;
-    private int imageRequestCode;
+    private int imageRequestCode = 100; //need to be changed as static
+    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+    private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 200;
 
     private OnFragmentInteractionListener mListener;
 
@@ -49,10 +51,11 @@ public class UploadPrescriptionButton extends Fragment {
     public static UploadPrescriptionButton newInstance(String param1, int param2) {
         UploadPrescriptionButton fragment = new UploadPrescriptionButton();
         Bundle args = new Bundle();
-        args.putString(FILE_URI_KEY, param1);
+       // args.putString(FILE_URI_KEY, param1); //uncomment for new instance
         //args.putString(MEDIA_TYPE_KEY, param2);
-        args.putInt(CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE_KEY, param2);
+       // args.putInt(CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE_KEY, param2);//uncomment for new instance
         fragment.setArguments(args);
+        Log.v(LOG_TAG, "inside new instance set");
         return fragment;
     }
 
@@ -64,9 +67,10 @@ public class UploadPrescriptionButton extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            fileUri = Uri.fromFile(new File(getArguments().getString(FILE_URI_KEY)));
+           // fileUri = Uri.fromFile(new File(getArguments().getString(FILE_URI_KEY))); //uncomment for new instance
             //mediaType = getArguments().getString(MEDIA_TYPE_KEY);
-            imageRequestCode = getArguments().getInt(CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE_KEY);
+           // imageRequestCode = getArguments().getInt(CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE_KEY); //uncomment for new instance
+          //  Log.v(LOG_TAG, "inside oncreate arguements set, arguements: " + fileUri + ", " + imageRequestCode);
         }
     }
 
@@ -76,32 +80,55 @@ public class UploadPrescriptionButton extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_upload_prescription_button, container, false);
         b1=(Button)view.findViewById(R.id.upldPresButton);
-        b1.setOnClickListener(new View.OnClickListener() {
+       /* b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //http://developer.android.com/training/camera/photobasics.html
+                fileUri = CreateFileInExt.getOutputMediaFileUri(MediaType.MEDIA_TYPE_IMAGE, getActivity());
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,fileUri);
-                if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                Log.v(LOG_TAG, "click working?");
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+              //  if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                     startActivityForResult(takePictureIntent, imageRequestCode);
-                }
+              //  }
                 //http://developer.android.com/training/camera/photobasics.html
             }
-        });
+        }); */
         return view;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        MainActivity ma = (MainActivity)getActivity();
-        ma.postImageUpload(requestCode,resultCode);
+        if(mListener!=null)
+            mListener.onFragmentInteraction(fileUri, requestCode, resultCode);
     }
 
 
+
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+    public void uploadPrescriptionClicked() {
+        //if (mListener != null) {
+       //     mListener.onFragmentInteraction(uri);
+       // }
+        //http://developer.android.com/training/camera/photobasics.html
+        fileUri = CreateFileInExt.getOutputMediaFileUri(MediaType.MEDIA_TYPE_IMAGE, getActivity());
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Log.v(LOG_TAG, "click working?");
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+          if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, imageRequestCode);
+          }
+        //http://developer.android.com/training/camera/photobasics.html
+    }
+
+    @Override
+    public void uploadPrescriptionClickedIM(){
+        fileUri = CreateFileInExt.getOutputMediaFileUri(MediaType.MEDIA_TYPE_IMAGE, getActivity());
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Log.v(LOG_TAG, "click working?");
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, imageRequestCode);
         }
     }
 
@@ -122,6 +149,7 @@ public class UploadPrescriptionButton extends Fragment {
         mListener = null;
     }
 
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -132,9 +160,10 @@ public class UploadPrescriptionButton extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+   public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        public void onFragmentInteraction(Uri uri, int requestCode, int ResultCode);
     }
+
 
 }

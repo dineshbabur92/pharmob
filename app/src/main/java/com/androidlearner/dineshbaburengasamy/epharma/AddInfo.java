@@ -70,7 +70,7 @@ public class AddInfo extends Fragment {
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.addInfo(uri);
         }
     }
 
@@ -103,7 +103,7 @@ public class AddInfo extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        public void addInfo(Uri uri);
     }
 
 }
