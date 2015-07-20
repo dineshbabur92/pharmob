@@ -4,12 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_weight="1"
-    android:id="@+id/uploadButtonContainer">
+    android:id="@+id/proceedButtonContainer">
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Upload Prescription"
-        android:id="@+id/upldPresButton"
+        android:text="@string/ProceedText"
+        android:id="@+id/proceedButton"
         android:layout_centerInParent="true"
-        android:onClick="uploadPrescriptionClicked"/>
+        android:onClick="proceedClicked"/>
 </RelativeLayout>

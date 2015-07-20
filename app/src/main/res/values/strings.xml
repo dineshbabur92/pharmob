@@ -6,4 +6,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="name_hint">Name</string>
     <string name="address_hint">Address</string>
+    <string name="uploadText">Capture Prescription</string>
+    <string name="ProceedText">Proceed</string>
 </resources>

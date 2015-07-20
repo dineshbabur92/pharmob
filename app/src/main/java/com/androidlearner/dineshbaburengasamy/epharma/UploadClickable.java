@@ -6,7 +6,7 @@ package com.androidlearner.dineshbaburengasamy.epharma;
 
 //***http://stackoverflow.com/questions/6091194/how-to-handle-button-clicks-using-the-xml-onclick-within-fragments
 
-public interface XmlClickable {
+public interface UploadClickable {
     public void uploadPrescriptionClickedIM();
 }
 //***http://stackoverflow.com/questions/6091194/how-to-handle-button-clicks-using-the-xml-onclick-within-fragments

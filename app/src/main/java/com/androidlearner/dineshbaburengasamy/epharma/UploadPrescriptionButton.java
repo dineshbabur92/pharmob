@@ -21,7 +21,7 @@ import android.widget.Button;
  * Use the {@link UploadPrescriptionButton#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class UploadPrescriptionButton extends Fragment implements XmlClickable{
+public class UploadPrescriptionButton extends Fragment implements UploadClickable {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
    // private static final String FILE_URI_KEY = "fileUri";//uncomment for new instance
@@ -106,7 +106,7 @@ public class UploadPrescriptionButton extends Fragment implements XmlClickable{
 
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void uploadPrescriptionClicked() {
+  /*  public void uploadPrescriptionClicked() {
         //if (mListener != null) {
        //     mListener.onFragmentInteraction(uri);
        // }
@@ -119,7 +119,7 @@ public class UploadPrescriptionButton extends Fragment implements XmlClickable{
                 startActivityForResult(takePictureIntent, imageRequestCode);
           }
         //http://developer.android.com/training/camera/photobasics.html
-    }
+    }*/
 
     @Override
     public void uploadPrescriptionClickedIM(){

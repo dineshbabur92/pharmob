@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 
-public class MainActivity extends ActionBarActivity implements UploadPrescriptionButton.OnFragmentInteractionListener, XmlClickable, AddInfo.OnFragmentInteractionListener{
+public class MainActivity extends ActionBarActivity implements UploadPrescriptionButton.OnFragmentInteractionListener, UploadClickable, ProceedClickable, ProceedButton.OnProceedInteractionListener, AddInfo.OnFragmentInteractionListener{
 
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 200;
@@ -22,6 +22,7 @@ public class MainActivity extends ActionBarActivity implements UploadPrescriptio
     private ImageView iv;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private UploadPrescriptionButton uploadButton;
+    private ProceedButton proceedButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +121,8 @@ public class MainActivity extends ActionBarActivity implements UploadPrescriptio
                 Bitmap bmp = BitmapFactory.decodeFile(fileUri.getPath());
                 iv.setImageBitmap(bmp);
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.main_container, new AddInfo());
+                proceedButton = new ProceedButton();
+                ft.replace(R.id.main_container, proceedButton);
                 ft.addToBackStack(null);
                 ft.commit();
                 //http://stackoverflow.com/questions/6224710/set-imageview-to-show-image-in-sdcard
@@ -150,12 +152,32 @@ public class MainActivity extends ActionBarActivity implements UploadPrescriptio
         uploadPrescriptionClickedIM();
     }
 
+    public void proceedClicked(View v){
+        onProceedClickedIM();
+    }
+
     @Override
     public void uploadPrescriptionClickedIM(){
         uploadButton.uploadPrescriptionClickedIM();
     }
+
+    @Override
+    public void onProceedClickedIM(){
+        proceedButton.onProceedClickedIM();
+    }
     //http://developer.android.com/guide/topics/media/camera.html#saving-media
     /** Create a file Uri for saving an image or video */
+
+    @Override
+    public void onProceedInteraction(){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+      //  ft.remove(getSupportFragmentManager().findFragmentById(R.id.uploadButtonContainer));
+      //  ft.remove(getSupportFragmentManager().findFragmentById(R.id.proceedButtonContainer));
+      //  ft.replace(R.id.main_container, new AddInfo());
+        ft.replace(R.id.main_container, new AddInfo());
+        ft.addToBackStack(null);
+        ft.commit();
+    }
 
     @Override
     public void addInfo(Uri uri){}
